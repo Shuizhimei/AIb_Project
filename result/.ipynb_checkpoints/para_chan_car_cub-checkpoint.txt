@@ -32,3 +32,6 @@ Layer: classifier.0.weight, Change Percentage: 0.0014
 Layer: classifier.0.bias, Change Percentage: 0.0003
 Layer: classifier.3.weight, Change Percentage: 0.0023
 Layer: classifier.3.bias, Change Percentage: 0.0003
+
+CUB
+1. 5-way-5-shot

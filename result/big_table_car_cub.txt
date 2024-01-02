@@ -1,5 +1,6 @@
-lr=1e-3, 50epoch
+50epoch
 1. 5-way-5-shot
+
 Cars:
 baseline: [0.2,0.2,0.2533,0.2,0.2,0.2133,0.2,0.2,0.16,0.1867] | 0.2013+-0.01649
 extract feature: [0.6267, 0.52, 0.7733, 0.52, 0.3600, 0.7733, 0.3867, 0.5067, 0.4533, 0.56] | 0.548+-0.1016
@@ -12,31 +13,12 @@ fit last 3: [0.4667, 0.4933, 0.48, 0.7333, 0.4667, 0.5467, 0.52, 0.7067, 0.60, 0
 
 CUB:
 baseline: [0.2, 0.28, 0.1867, 0.2, 0.2, 0.1867, 0.2533, 0.2, 0.2, 0.2] | 0.2107+-0.0219
-extract feature: [0.8400, 0.6933, 0.8667, 0.7733, 0.7733, 0.8133, 0.8400, 0.8533, 0.8800, ?]
-all fit linear:
-all fit centroid:
+extract feature: [0.8400, 0.6933, 0.8667, 0.7733, 0.7733, 0.8133, 0.8400, 0.8533, 0.8800, 0.8000] | 0.8133+-0.0400
+all fit linear: [0.8667, 0.76, 0.84, 0.8933, 0.6533, 0.8133, 0.7467, 0.8133, 0.8933, 0.7867] | 0.8067+-0.0531
+all fit centroid: [0.6667, 0.7867, 0.8667]
 all fit cosine:
 fit last 1:
 fit last 2：
 fit last 3:
 
-EuroSAT:
-baseline: 
-extract feature: 
-all fit linear:
-all fit centroid:
-all fit cosine:
-fit last 1:
-fit last 2：
-fit last 3:
-
-Plant Disease:
-baseline: 
-extract feature: 
-all fit linear:
-all fit centroid:
-all fit cosine:
-fit last 1:
-fit last 2：
-fit last 3:
 

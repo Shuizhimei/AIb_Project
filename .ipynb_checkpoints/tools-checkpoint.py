@@ -37,7 +37,7 @@ def t_SNE(features, labels, save_name):
     plt.show()
 
 
-def visulize_para_change(param_changes):
+def visulize_para_change(param_changes, path1, path2):
     # Extract layers and change percentages
     layers = list(param_changes.keys())
     change_percentages = list(param_changes.values())
@@ -54,7 +54,7 @@ def visulize_para_change(param_changes):
     plt.title('Change Percentage for Weights in Each Layer')
     plt.xticks(rotation=45, ha='right')
     plt.legend()
-    plt.savefig('./result/car/weights_line_chart.png')
+    plt.savefig(path1)
     plt.show()
 
     # Plot change percentages for biases
@@ -65,6 +65,6 @@ def visulize_para_change(param_changes):
     plt.title('Change Percentage for Biases in Each Layer')
     plt.xticks(rotation=45, ha='right')
     plt.legend()
-    plt.savefig('./result/car/biases_line_chart.png')
+    plt.savefig(path2)
     plt.show()
 

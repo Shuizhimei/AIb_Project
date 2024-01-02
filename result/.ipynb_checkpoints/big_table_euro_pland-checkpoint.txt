@@ -1,0 +1,19 @@
+EuroSAT:
+baseline: 
+extract feature: 
+all fit linear:
+all fit centroid:
+all fit cosine:
+fit last 1:
+fit last 2：
+fit last 3:
+
+Plant Disease:
+baseline: 
+extract feature: 
+all fit linear:
+all fit centroid:
+all fit cosine:
+fit last 1:
+fit last 2：
+fit last 3:

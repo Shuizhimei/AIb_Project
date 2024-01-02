@@ -1,0 +1,7 @@
+(except last layer)
+
+EuroSAT
+1. 5-way-5-shot
+
+PlantDisease
+1. 5-way-5-shot
