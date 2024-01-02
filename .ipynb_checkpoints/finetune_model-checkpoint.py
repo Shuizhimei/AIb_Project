@@ -4,11 +4,31 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+from torchvision import models, transforms
+import torchvision
+import copy
+
+import dataset_pre
 
 # Optimizer
 MOMENTUM = 0.9
 STEP=5
 GAMMA=0.5
+
+# Size
+BATCH_SIZE = 32
+EPOCH = 50
+
+num_features_in = 4096
+num_features_out = 1000
+
+# Adjust to fit vgg16
+data_transforms = transforms.Compose([
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
 
 # finetune main process
 def train_model(model, device, criterion, optimizer, scheduler, train_set, train_dataloader, test_set, test_dataloader, num_epochs):
@@ -45,6 +65,8 @@ def train_model(model, device, criterion, optimizer, scheduler, train_set, train
         # Test
         model.eval()
         print('Begin test......')
+        features = []
+        targets = []
         
         # Variables to store test loss and correct predictions
         test_loss = 0.0
@@ -57,6 +79,9 @@ def train_model(model, device, criterion, optimizer, scheduler, train_set, train
 
                 # Forward pass
                 outputs = model(inputs)
+                features.append(outputs.view(outputs.size(0), -1).cpu())
+                targets.append(labels.cpu())
+
                 loss = criterion(outputs, labels)
 
                 # Update test loss
@@ -74,8 +99,8 @@ def train_model(model, device, criterion, optimizer, scheduler, train_set, train
 
         # Print the results
         print(f"Test Loss: {average_loss:.4f},Test Accuracy: {accuracy:.4f}")
-
-    return model
+    
+    return model, accuracy, torch.cat(features), torch.cat(targets)
 
 class MeanCentroidClassifier(nn.Module):
     def __init__(self, input_dim, num_classes):
@@ -143,12 +168,81 @@ def fit_last(model, num_features_in, total_classes_num, lr, k):
     
     return model, optimizer, scheduler
 
+# k-shot for 5 times
+def k_shot(base_folder, shot_folder, test_folder, images_per_class, num_total_classes, lr, criterion, device, mode):
+    accs = [] 
+    for i in range(10):
+        dataset_pre.split_shot_data(base_folder, base_folder+shot_folder, base_folder+test_folder, num_total_classes, images_per_class)
+        shot_set = torchvision.datasets.ImageFolder(root=base_folder+shot_folder,transform=data_transforms)
+        shot_dataloader = torch.utils.data.DataLoader(dataset=shot_set,batch_size=BATCH_SIZE,shuffle=True)
+        test_set = torchvision.datasets.ImageFolder(base_folder+test_folder,transform=data_transforms)
+        test_dataloader = torch.utils.data.DataLoader(dataset=test_set,batch_size=BATCH_SIZE,shuffle=True)
+        
+        if mode == "baseline":
+            model = models.vgg16(pretrained=False)
+            model, optimizer, scheduler = all_fit("linear", model, num_features_in, num_total_classes, lr)
+            model = model.to(device)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        elif mode == "extract_feature":
+            model = models.vgg16(pretrained=True)
+            model, optimizer, scheduler = fixed_feature_extracter(model, num_features_out, num_total_classes, lr)
+            model = model.to(device)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        elif mode == "af_linear":
+            model = models.vgg16(pretrained=True)
+            model, optimizer, scheduler = all_fit("linear", model, num_features_in, num_total_classes, lr)
+            model = model.to(device)
+            if i == 9:
+                model_before_finetune = copy.deepcopy(model)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        elif mode == "af_centroid":
+            model = models.vgg16(pretrained=True)
+            model, optimizer, scheduler = all_fit("mean_centroid", model, num_features_in, num_total_classes, lr)
+            model = model.to(device)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        elif mode == "af_cosine":
+            model = models.vgg16(pretrained=True)
+            model, optimizer, scheduler = all_fit("cosine", model, num_features_in, num_total_classes, lr)
+            model = model.to(device)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        elif mode == "fit_l1":
+            model = models.vgg16(pretrained=True)
+            model, optimizer, scheduler = fit_last(model, num_features_in, num_total_classes, lr, 1)
+            model = model.to(device)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        elif mode == "fit_l2":
+            model = models.vgg16(pretrained=True)
+            model, optimizer, scheduler = fit_last(model, num_features_in, num_total_classes, lr, 2)
+            model = model.to(device)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        elif mode == "fit_l3":
+            model = models.vgg16(pretrained=True)
+            model, optimizer, scheduler = fit_last(model, num_features_in, num_total_classes, lr, 3)
+            model = model.to(device)
+            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
+                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
+        else:
+            print("error")
+        accs.append(accuracy.item())
+    if mode == "af_linear":
+        return accs, features, labels, model_before_finetune, after_model
+    return accs, features, labels
+        
 # Parameters comparison
 def compare_params(model_before, model_after):
     # Store the change rate of each layer's parameters
     param_changes = {}
 
     for name_before, param_before in model_before.named_parameters():
+        if name_before == "classifier.6.weight" or name_before == "classifier.6.bias":
+            continue
         # Parameters of the fine-tuning model
         param_after = dict(model_after.named_parameters())[name_before]
 

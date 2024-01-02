@@ -1,0 +1,34 @@
+(except last layer)
+
+Cars
+1. 5-way-5-shot
+Layer: features.0.weight, Change Percentage: 0.0007
+Layer: features.0.bias, Change Percentage: 0.0004
+Layer: features.2.weight, Change Percentage: 0.0011
+Layer: features.2.bias, Change Percentage: 0.0005
+Layer: features.5.weight, Change Percentage: 0.0009
+Layer: features.5.bias, Change Percentage: 0.0004
+Layer: features.7.weight, Change Percentage: 0.0011
+Layer: features.7.bias, Change Percentage: 0.0003
+Layer: features.10.weight, Change Percentage: 0.0011
+Layer: features.10.bias, Change Percentage: 0.0002
+Layer: features.12.weight, Change Percentage: 0.0010
+Layer: features.12.bias, Change Percentage: 0.0002
+Layer: features.14.weight, Change Percentage: 0.0010
+Layer: features.14.bias, Change Percentage: 0.0001
+Layer: features.17.weight, Change Percentage: 0.0010
+Layer: features.17.bias, Change Percentage: 0.0001
+Layer: features.19.weight, Change Percentage: 0.0011
+Layer: features.19.bias, Change Percentage: 0.0001
+Layer: features.21.weight, Change Percentage: 0.0011
+Layer: features.21.bias, Change Percentage: 0.0001
+Layer: features.24.weight, Change Percentage: 0.0012
+Layer: features.24.bias, Change Percentage: 0.0002
+Layer: features.26.weight, Change Percentage: 0.0013
+Layer: features.26.bias, Change Percentage: 0.0001
+Layer: features.28.weight, Change Percentage: 0.0015
+Layer: features.28.bias, Change Percentage: 0.0002
+Layer: classifier.0.weight, Change Percentage: 0.0014
+Layer: classifier.0.bias, Change Percentage: 0.0003
+Layer: classifier.3.weight, Change Percentage: 0.0023
+Layer: classifier.3.bias, Change Percentage: 0.0003
