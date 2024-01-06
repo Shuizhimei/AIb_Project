@@ -8,12 +8,6 @@ from sklearn.model_selection import train_test_split
 
 QUERY_SIZE = 15
 
-# ChestX
-cx_label_path = './data/Coronahack-Chest-XRay-Dataset/Chest_xray_Corona_Metadata.csv'
-cx_test_path = './data/Coronahack-Chest-XRay-Dataset/test'
-cx_train_path = './data/Coronahack-Chest-XRay-Dataset/train'
-cx_output_path = './data/chestX/'
-
 # EuroSAT
 eu_source_path = './data/EuroSAT_RGB'
 eurosat_path = './data/EuroSAT'

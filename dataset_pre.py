@@ -8,12 +8,6 @@ from sklearn.model_selection import train_test_split
 
 QUERY_SIZE = 15
 
-# ChestX
-cx_label_path = './data/Coronahack-Chest-XRay-Dataset/Chest_xray_Corona_Metadata.csv'
-cx_test_path = './data/Coronahack-Chest-XRay-Dataset/test'
-cx_train_path = './data/Coronahack-Chest-XRay-Dataset/train'
-cx_output_path = './data/chestX/'
-
 # EuroSAT
 eu_source_path = './data/EuroSAT_RGB'
 eurosat_path = './data/EuroSAT'
@@ -27,30 +21,6 @@ cub_images_path = os.path.join(cub_path, 'images')
 cub_labels_file_path = os.path.join(cub_path, 'image_class_labels.txt')
 cub_split_file_path = os.path.join(cub_path, 'train_test_split.txt')
 cub_new_path = './data/CUB'
-
-# Preprocess ChestX Dataset
-def init_chestX():
-    if os.path.exists(cx_output_path):
-        return
-    
-    labels_df = pd.read_csv(cx_label_path)
-
-    os.makedirs(os.path.join(cx_output_path, 'train', 'Pnemonia'), exist_ok=True)
-    os.makedirs(os.path.join(cx_output_path, 'train', 'Normal'), exist_ok=True)
-    os.makedirs(os.path.join(cx_output_path, 'test', 'Pnemonia'), exist_ok=True)
-    os.makedirs(os.path.join(cx_output_path, 'test', 'Normal'), exist_ok=True)
-
-    for index, row in labels_df.iterrows():
-        image_name = row['X_ray_image_name']
-        label = row['Label']
-        category = row['Dataset_type']
-        if category == "TRAIN":
-            source_path = os.path.join(cx_train_path, image_name)
-            destination_path = os.path.join(cx_output_path, 'train', label, image_name)
-        else:
-            source_path = os.path.join(cx_test_path, image_name)
-            destination_path = os.path.join(cx_output_path, 'test', label, image_name)
-        shutil.copyfile(source_path, destination_path)
 
 def init_EuroSAT():
     if os.path.exists(eurosat_path):

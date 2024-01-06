@@ -102,18 +102,6 @@ def train_model(model, device, criterion, optimizer, scheduler, train_set, train
     
     return model, accuracy, torch.cat(features), torch.cat(targets)
 
-class MeanCentroidClassifier(nn.Module):
-    def __init__(self, input_dim, num_classes):
-        super(MeanCentroidClassifier, self).__init__()
-        self.centroids = nn.Parameter(torch.randn(num_classes, input_dim), requires_grad=True)
-
-    def forward(self, x):
-        # x: (batch_size, input_dim)
-        # Calculate negative cosine similarities
-        similarities = -F.cosine_similarity(x.unsqueeze(1), self.centroids.unsqueeze(0), dim=2)
-        # Return logits
-        return similarities
-
 class CosineSimilarityClassifier(nn.Module):
     def __init__(self, input_dim, num_classes):
         super(CosineSimilarityClassifier, self).__init__()
@@ -146,8 +134,6 @@ def all_fit(mode, model, num_features_in, total_classes_num, lr):
     # Change model according to mode
     if mode == "linear":
         model.classifier[-1] = nn.Linear(num_features_in, total_classes_num)
-    elif mode == "mean_centroid":
-        model.classifier[-1] = MeanCentroidClassifier(num_features_in, total_classes_num)
     elif mode == "cosine":
         model.classifier[-1] = CosineSimilarityClassifier(num_features_in, total_classes_num)
     
@@ -196,12 +182,6 @@ def k_shot(base_folder, shot_folder, test_folder, images_per_class, num_total_cl
             model = model.to(device)
             if i == 9:
                 model_before_finetune = copy.deepcopy(model)
-            after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
-                                                 shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
-        elif mode == "af_centroid":
-            model = models.vgg16(pretrained=True)
-            model, optimizer, scheduler = all_fit("mean_centroid", model, num_features_in, num_total_classes, lr)
-            model = model.to(device)
             after_model, accuracy, features, labels = train_model(model, device, criterion, optimizer, scheduler, 
                                                  shot_set, shot_dataloader, test_set, test_dataloader, EPOCH)
         elif mode == "af_cosine":
